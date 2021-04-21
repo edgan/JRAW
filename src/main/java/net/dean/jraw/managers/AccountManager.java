@@ -709,8 +709,8 @@ public class AccountManager extends AbstractManager {
         private final URL url;
         private final String subreddit;
         private final String title;
-        private final String flairID;
-        private final String flairText;
+        private String flairID;
+        private String flairText;
         private boolean saveAfter; // = false;
         private boolean sendRepliesToInbox; // = false;
         private boolean resubmit = true;
