@@ -76,6 +76,7 @@ public class AccountManager extends AbstractManager {
                 "kind", b.selfPost ? "self" : "link",
                 "resubmit", b.resubmit,
                 "save", b.saveAfter,
+                "validate_on_submit", true,
                 "sendreplies", b.sendRepliesToInbox,
                 "sr", b.subreddit,
                 "then", "comments",
@@ -86,6 +87,14 @@ public class AccountManager extends AbstractManager {
             args.put("text", b.selfText);
         } else {
             args.put("url", b.url.toExternalForm());
+        }
+        
+        if(b.flairID != null) {
+            args.put("flair_id", b.flairID)   
+        }
+
+        if(b.flairText != null) {
+            args.put("flair_text", b.flairText)   
         }
 
         if (captcha != null) {
@@ -310,6 +319,7 @@ public class AccountManager extends AbstractManager {
                 .post(JrawUtils.mapOf(
                         "api_type", "json",
                         "text", text,
+                        "validate_on_submit", true,
                         "thing_id", contribution.getFullName()
                 )).build());
     }
@@ -699,6 +709,8 @@ public class AccountManager extends AbstractManager {
         private final URL url;
         private final String subreddit;
         private final String title;
+        private final String flairID;
+        private final String flairText;
         private boolean saveAfter; // = false;
         private boolean sendRepliesToInbox; // = false;
         private boolean resubmit = true;
@@ -741,6 +753,28 @@ public class AccountManager extends AbstractManager {
          */
         public SubmissionBuilder saveAfter(boolean flag) {
             this.saveAfter = flag;
+            return this;
+        }
+        
+        /**
+         * Whether to flair submission during posting
+         *
+         * @param id Reddit flair ID
+         * @return This builder
+         */
+        public SubmissionBuilder flairID(String id) {
+            this.flairID = id;
+            return this;
+        }
+        
+        /**
+         * Support text for flair
+         *
+         * @param id Reddit flair ID
+         * @return This builder
+         */
+        public SubmissionBuilder flairText(String text) {
+            this.flairText = text;
             return this;
         }
 
