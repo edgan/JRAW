@@ -90,11 +90,11 @@ public class AccountManager extends AbstractManager {
         }
         
         if(b.flairID != null) {
-            args.put("flair_id", b.flairID)   
+            args.put("flair_id", b.flairID);
         }
 
         if(b.flairText != null) {
-            args.put("flair_text", b.flairText)   
+            args.put("flair_text", b.flairText);
         }
 
         if (captcha != null) {
