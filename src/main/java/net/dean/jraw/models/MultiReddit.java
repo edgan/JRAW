@@ -96,7 +96,11 @@ public final class MultiReddit extends Thing implements Created {
      */
     @JsonProperty
     public String getPath() {
-        return data("path");
+        if(data("path").endsWith("/")) {
+            return data("path");
+        } else {
+            return data("path") + "/";
+        }
     }
 
     @Override
