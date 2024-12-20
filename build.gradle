@@ -1,9 +1,12 @@
 plugins {
     id 'java'
-    id 'maven'
     id 'maven-publish'
     id 'jacoco'
     id 'com.github.kt3k.coveralls' version '2.4.0x'
+}
+
+wrapper {
+    gradleVersion = '8.11.1'
 }
 
 ext {
@@ -12,7 +15,11 @@ ext {
 }
 
 allprojects {
-    sourceCompatibility = 1.7
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
     group = 'net.dean.jraw'
     version = '0.9.0'
 
@@ -25,48 +32,50 @@ allprojects {
 
 dependencies {
     def okHttpVersion = '3.1.2'
-    compile     "com.squareup.okhttp3:okhttp:$okHttpVersion"
-    compile     "com.squareup.okhttp3:okhttp-urlconnection:$okHttpVersion"
-    compile     'com.fasterxml.jackson.core:jackson-databind:2.6.0'
-    compile     'com.google.guava:guava:19.0'
-    compile     'org.slf4j:slf4j-api:1.7.13'
-    testCompile 'org.slf4j:slf4j-simple:1.7.13'
-    testCompile 'org.testng:testng:6.9.10'
-    testCompile 'net.sourceforge.htmlunit:htmlunit:2.19'
+    implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
+    implementation "com.squareup.okhttp3:okhttp-urlconnection:$okHttpVersion"
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
+    implementation 'com.google.guava:guava:19.0'
+    implementation 'org.slf4j:slf4j-api:1.7.13'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.13'
+    testImplementation 'org.testng:testng:6.9.10'
+    testImplementation 'net.sourceforge.htmlunit:htmlunit:2.19'
 }
 
 // Add the generated source to the main Java source directories
 sourceSets.main.java.srcDir ext.generatedJavaSrc
 
 task fatJar(type: Jar, dependsOn: assemble) {
-    classifier = 'fat'
-    destinationDir = releaseDest
+    archiveClassifier.set('fat')
+    destinationDirectory.set(releaseDest)
     from(
-            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) },
+            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) },
             sourceSets.main.output
     )
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    destinationDir = releaseDest
-    from javadoc.destinationDir
+    archiveClassifier.set('javadoc')
+    destinationDirectory.set(releaseDest)
+    from javadoc.destinationDir  // Keep this as is
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    destinationDir = releaseDest
+    archiveClassifier.set('sources')
+    destinationDirectory.set(releaseDest)
     from sourceSets.main.allSource
 }
 
-task renamePom(dependsOn: 'generatePomFileForMavenPublication') << {
-    println(file('build/publications/maven/pom-default.xml'))
-    file('build/publications/maven/pom-default.xml').renameTo("build/publications/maven/JRAW-${version}.pom")
+task renamePom(dependsOn: 'generatePomFileForMavenPublication') {
+    doLast {
+        println(file('build/publications/maven/pom-default.xml'))
+        file('build/publications/maven/pom-default.xml').renameTo("build/publications/maven/JRAW-${version}.pom")
+    }
 }
 
 task release(type: Jar, dependsOn: ['fatJar', 'javadocJar', 'sourcesJar', 'renamePom']) {
     from sourceSets.main.output
-    destinationDir = releaseDest
+    destinationDirectory.set(releaseDest)
 }
 
 javadoc {
@@ -90,8 +99,8 @@ test {
 
 jacocoTestReport {
     reports {
-        xml.enabled = true // coveralls depends on XML reports
-        html.enabled = true
+        xml.required.set(true) // coveralls depends on XML reports
+        html.required.set(true)
     }
 }
 
@@ -109,8 +118,3 @@ artifacts {
 }
 
 defaultTasks "test"
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
-    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
-}

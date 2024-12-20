@@ -770,7 +770,7 @@ public class AccountManager extends AbstractManager {
         /**
          * Support text for flair
          *
-         * @param id Reddit flair ID
+         * @param text Reddit flair ID
          * @return This builder
          */
         public SubmissionBuilder flairText(String text) {
