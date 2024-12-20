@@ -37,6 +37,7 @@ public final class Submission extends PublicContribution {
 
     }
 
+
     /** Gets who approved this submission, or null if the logged in account is not a moderator */
     @JsonProperty(nullable = true)
     public String getApprovedBy() {
@@ -77,6 +78,15 @@ public final class Submission extends PublicContribution {
     @JsonProperty
     public String getDomain() {
         return data("domain");
+    }
+
+    /**
+     * Gets is_gallery value of submission
+     * @return Gets is_gallery value of submission
+     */
+    @JsonProperty
+    public Boolean isGallery() {
+        return data.get("is_gallery").booleanValue();
     }
 
     /**
