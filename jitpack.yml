@@ -1,2 +1,2 @@
-environment:
-  JAVA_VERSION: 21
+jdk:
+  - openjdk21
