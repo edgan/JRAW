@@ -81,12 +81,13 @@ public final class Submission extends PublicContribution {
     }
 
     /**
-     * Gets is_gallery value of submission
-     * @return Gets is_gallery value of submission
+     * Gets is_gallery value of submission. Returns false if the submission is not a gallery post.
+     * @return true if submission is a gallery post, false otherwise
      */
     @JsonProperty
     public Boolean isGallery() {
-        return data.get("is_gallery").booleanValue();
+        JsonNode galleryNode = data.get("is_gallery");
+        return galleryNode != null && galleryNode.booleanValue();
     }
 
     /**
