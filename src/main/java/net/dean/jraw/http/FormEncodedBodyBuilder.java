@@ -1,7 +1,7 @@
 package net.dean.jraw.http;
 
 import com.google.common.net.MediaType;
-import okhttp3.internal.Util;
+import java.nio.charset.StandardCharsets;
 import net.dean.jraw.util.JrawUtils;
 
 import java.util.Map;
@@ -48,7 +48,7 @@ public final class FormEncodedBodyBuilder {
         }
 
         // Convert to bytes so RequestBody.create() doesn't add a charset to the content-type.
-        byte[] contentBytes = content.toString().getBytes(Util.UTF_8);
+        byte[] contentBytes = content.toString().getBytes(StandardCharsets.UTF_8);
         return RequestBody.create(TYPE, contentBytes);
     }
 }

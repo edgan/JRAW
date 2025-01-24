@@ -1,7 +1,7 @@
 package net.dean.jraw.http;
 
 import com.google.common.net.MediaType;
-import okhttp3.internal.Util;
+import java.nio.charset.StandardCharsets;
 import okio.BufferedSink;
 
 import java.io.IOException;
@@ -18,11 +18,11 @@ public abstract class RequestBody {
     public abstract void writeTo(BufferedSink sink) throws IOException;
 
     public static RequestBody create(MediaType contentType, String content) {
-        Charset charset = Util.UTF_8;
+        Charset charset = StandardCharsets.UTF_8;
         if (contentType != null) {
             charset = contentType.charset().orNull();
             if (charset == null) {
-                charset = Util.UTF_8;
+                charset = StandardCharsets.UTF_8;
                 contentType = MediaType.parse(contentType + "; charset=utf-8");
             }
         }
