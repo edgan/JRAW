@@ -352,17 +352,32 @@ public final class CommentNode implements Iterable<CommentNode> {
      * @throws NetworkException If the request was not successful
      */
     public List<CommentNode> loadMoreComments(RedditClient reddit) throws NetworkException {
-        if (!hasMoreComments())
+        return loadMoreComments(reddit, this.moreChildren);
+    }
+
+    /**
+     * Gets more comments from the provided {@link MoreChildren} object and inserts them into the tree. This method
+     * returns only new <em>root</em> nodes. If the provided MoreChildren is null, then an empty list is returned.
+     * A null value is never returned.
+     *
+     * @param reddit Used to make the request
+     * @param moreChildrenToLoad The MoreChildren object to load (can be different from this node's moreChildren)
+     * @return A List of new root nodes
+     * @throws NetworkException If the request was not successful
+     */
+    public List<CommentNode> loadMoreComments(RedditClient reddit, MoreChildren moreChildrenToLoad) throws NetworkException {
+        if (moreChildrenToLoad == null)
             // Nothing to do
             return new ArrayList<>();
 
-        if (isThreadContinuation())
+        // Check if this is a thread continuation using the provided MoreChildren
+        if (isThreadContinuation(moreChildrenToLoad))
             return continueThread(reddit);
 
         int relativeRootDepth = depth + 1;
         List<CommentNode> newRootNodes = new ArrayList<>();
-        List<Thing> thingsToAdd = getMoreComments(reddit);
-        this.moreChildren = null;
+        List<Thing> thingsToAdd = getMoreComments(reddit, moreChildrenToLoad);
+        // Don't clear moreChildren here - wait until processing is complete
 
         List<Comment> newComments = new ArrayList<>();
         List<MoreChildren> newMores = new ArrayList<>();
@@ -428,6 +443,12 @@ public final class CommentNode implements Iterable<CommentNode> {
             JrawUtils.logger().warn("Unable to find parent for " + m);
         }
 
+        // Only clear moreChildren after all processing is complete and successful
+        // But only if we were loading from this node's own moreChildren
+        if (moreChildrenToLoad == this.moreChildren) {
+            this.moreChildren = null;
+        }
+
         return newRootNodes;
     }
 
@@ -470,9 +491,29 @@ public final class CommentNode implements Iterable<CommentNode> {
      * @return If this comment's MoreChildren object represents a truncated comment branch.
      */
     public boolean isThreadContinuation() {
+        return isThreadContinuation(this.moreChildren);
+    }
+
+    /**
+     * <p>Checks if the provided {@link MoreChildren} object represents a truncated thread. This normally happens when
+     * the depth of a particular branch of the tree exceeds 10. On the website, the MoreChildren will be represented as
+     * a link with the text "continue this thread &rarr;." If a MoreChildren object points to a truncated branch, then
+     * two things must be true:
+     * <p>
+     * <ol>
+     * <li>The MoreChildren's "count" attribute is zero
+     * <li>The MoreChildren's ID is "_"
+     * </ol>
+     * <p>
+     * <p>If these things are true, then this method will return true.
+     *
+     * @param moreChildren The MoreChildren object to check
+     * @return If the MoreChildren object represents a truncated comment branch.
+     */
+    public boolean isThreadContinuation(MoreChildren moreChildren) {
         // A 'continue this thread' type MoreChildren will have a count of 0 and the first child will be the ID of this
         // node's comment
-        return hasMoreComments() &&
+        return moreChildren != null &&
                 moreChildren.getCount() == 0 &&
                 moreChildren.getId().equals("_");
     }
@@ -487,9 +528,23 @@ public final class CommentNode implements Iterable<CommentNode> {
      * @throws NetworkException If the request was not successful
      */
     @EndpointImplementation(Endpoints.MORECHILDREN)
-    public List<Thing> getMoreComments(RedditClient reddit)
-            throws NetworkException {
-        if (!hasMoreComments())
+    public List<Thing> getMoreComments(RedditClient reddit) throws NetworkException {
+        return getMoreComments(reddit, this.moreChildren);
+    }
+
+    /**
+     * Gets a list of {@link Comment} and {@link MoreChildren} objects from the provided MoreChildren object. The
+     * resulting Things will be listed as if they were iterated in pre-order traversal. To add these new comments to the
+     * tree, use {@link #loadMoreComments(RedditClient)} instead.
+     *
+     * @param reddit The RedditClient to make the HTTP request with
+     * @param moreChildren The MoreChildren object to load comments from
+     * @return A list of new Comments and MoreChildren objects
+     * @throws NetworkException If the request was not successful
+     */
+    @EndpointImplementation(Endpoints.MORECHILDREN)
+    public List<Thing> getMoreComments(RedditClient reddit, MoreChildren moreChildren) throws NetworkException {
+        if (moreChildren == null)
             return new ArrayList<>();
 
         List<String> moreIds = moreChildren.getChildrenIds();
