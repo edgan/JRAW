@@ -366,9 +366,15 @@ public final class CommentNode implements Iterable<CommentNode> {
      * @throws NetworkException If the request was not successful
      */
     public List<CommentNode> loadMoreComments(RedditClient reddit, MoreChildren moreChildrenToLoad) throws NetworkException {
-        if (moreChildrenToLoad == null)
-            // Nothing to do
+        // Added verbose logging to help diagnose issues where no comments are returned
+        if (moreChildrenToLoad == null) {
+            JrawUtils.logger().debug("loadMoreComments: Provided MoreChildren is null. Returning empty list.");
             return new ArrayList<>();
+        }
+
+        // Log basic information about the MoreChildren object that is about to be loaded
+        JrawUtils.logger().debug("loadMoreComments: Loading MoreChildren - count: {}, childrenIds: {}, parentId: {}",
+                moreChildrenToLoad.getCount(), moreChildrenToLoad.getChildrenIds(), moreChildrenToLoad.getParentId());
 
         // Check if this is a thread continuation using the provided MoreChildren
         if (isThreadContinuation(moreChildrenToLoad))
@@ -393,6 +399,9 @@ public final class CommentNode implements Iterable<CommentNode> {
                         + t.getClass().getName());
             }
         }
+
+        // Log what the Reddit API actually returned
+        JrawUtils.logger().debug("loadMoreComments: Reddit API returned {} things: {}", thingsToAdd.size(), thingsToAdd);
 
         // Comments from /api/morechildren are listed as if they were iterated in pre-order traversal
         CommentNode parent = this;
@@ -573,6 +582,9 @@ public final class CommentNode implements Iterable<CommentNode> {
             morechildrenLock.unlock();
         }
 
+        // Log the raw JSON response for further inspection
+        JrawUtils.logger().debug("getMoreComments: Raw API JSON: {}", response.getJson());
+
         JsonNode things = response.getJson().get("json").get("data").get("things");
         List<Thing> commentList = new ArrayList<>(things.size());
         for (JsonNode node : things) {
@@ -587,6 +599,9 @@ public final class CommentNode implements Iterable<CommentNode> {
                         kind, Model.Kind.COMMENT, Model.Kind.MORE));
             }
         }
+
+        // Log how many Things were parsed from the response
+        JrawUtils.logger().debug("getMoreComments: Parsed {} things from response.", commentList.size());
 
         return commentList;
     }
