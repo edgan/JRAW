@@ -104,7 +104,7 @@ public class OAuthHelper {
                         "client_id", creds.getClientId(),
                         "response_type", "code",
                         "state", state,
-                        "redirect_uri", creds.getRedirectUrl().toExternalForm(),
+                        "redirect_uri", creds.getRedirectUrl(),
                         "duration", permanent ? "permanent" : "temporary",
                         "scope", JrawUtils.join(' ', scopes)
                 )).build();

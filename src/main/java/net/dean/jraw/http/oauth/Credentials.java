@@ -1,9 +1,7 @@
 package net.dean.jraw.http.oauth;
 
-import net.dean.jraw.util.JrawUtils;
 import net.dean.jraw.http.AuthenticationMethod;
 
-import java.net.URL;
 import java.util.UUID;
 
 /**
@@ -16,7 +14,7 @@ public final class Credentials {
     private final String clientId;
     private final String clientSecret;
     private final UUID deviceId;
-    private final URL redirectUrl;
+    private final String redirectUrl;
 
     private Credentials(AuthenticationMethod authenticationMethod, String username, String password, String clientId,
                         String clientSecret, String redirectUrl) {
@@ -31,7 +29,7 @@ public final class Credentials {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.deviceId = deviceId;
-        this.redirectUrl = redirectUrl != null ? JrawUtils.newUrl(redirectUrl) : null;
+        this.redirectUrl = redirectUrl;
     }
 
     /**
@@ -80,7 +78,7 @@ public final class Credentials {
         return deviceId;
     }
 
-    public URL getRedirectUrl() {
+    public String getRedirectUrl() {
         return redirectUrl;
     }
 
