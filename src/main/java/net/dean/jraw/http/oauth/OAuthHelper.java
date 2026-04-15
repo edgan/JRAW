@@ -8,6 +8,8 @@ import net.dean.jraw.models.JsonModel;
 import net.dean.jraw.util.JrawUtils;
 
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.SecureRandom;
 import com.google.common.net.MediaType;
@@ -136,8 +138,13 @@ public class OAuthHelper {
             throw new IllegalStateException("Auth flow not started yet. See getAuthorizationUrl()");
         }
 
-        HttpRequest request = HttpRequest.from("irrelevant", JrawUtils.newUrl(finalUrl));
-        Map<String, String> query = JrawUtils.parseUrlEncoded(request.getUrl().getQuery());
+        String rawQuery;
+        try {
+            rawQuery = new URI(finalUrl).getRawQuery();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Malformed redirect URI: " + finalUrl, e);
+        }
+        Map<String, String> query = JrawUtils.parseUrlEncoded(rawQuery);
         if (!query.containsKey("state"))
             throw new IllegalArgumentException("Final redirect URI did not contain the 'state' query parameter");
         if (!query.get("state").equals(state))
