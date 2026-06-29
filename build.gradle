@@ -31,7 +31,7 @@ allprojects {
 }
 
 dependencies {
-    def okHttpVersion = '4.11.0'
+    def okHttpVersion = '5.4.0'
     implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
     implementation "com.squareup.okhttp3:okhttp-urlconnection:$okHttpVersion"
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.6.0'

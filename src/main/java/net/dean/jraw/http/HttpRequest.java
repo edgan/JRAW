@@ -3,7 +3,6 @@ package net.dean.jraw.http;
 import com.google.common.net.MediaType;
 import okhttp3.CacheControl;
 import okhttp3.Headers;
-import okhttp3.internal.Util;
 import okhttp3.internal.http.HttpMethod;
 import net.dean.jraw.Endpoints;
 import net.dean.jraw.util.JrawUtils;
@@ -249,7 +248,9 @@ public final class HttpRequest {
                 throw new IllegalArgumentException("Request body not allowed for " + method);
             }
             if (body == null && HttpMethod.permitsRequestBody(method)) {
-                body = RequestBody.create(null, Util.EMPTY_BYTE_ARRAY);
+                // okhttp3.internal.Util (and its EMPTY_BYTE_ARRAY) was removed in OkHttp 5;
+                // an empty array is equivalent and works on both OkHttp 4 and 5.
+                body = RequestBody.create(null, new byte[0]);
             }
             this.method = method;
             this.body = body;
