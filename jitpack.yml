@@ -1,2 +1,5 @@
+# The JDK jitpack launches Gradle on. Matches the Java 25 toolchain in build.gradle, so jitpack's
+# own JDK satisfies it directly; the foojay resolver in settings.gradle is the fallback for a
+# builder that has no 25 locally.
 jdk:
-  - openjdk21
+  - openjdk25

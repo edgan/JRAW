@@ -7,6 +7,7 @@ import net.dean.jraw.models.meta.Model;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Date;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents an update in a live thread
@@ -20,13 +21,13 @@ public final class LiveUpdate extends Thing implements Created {
 
     /** The value of the update */
     @JsonProperty
-    public String getBody() {
+    public @Nullable String getBody() {
         return data("body");
     }
 
     /** Gets the name of the user who created this update */
     @JsonProperty
-    public String getAuthor() {
+    public @Nullable String getAuthor() {
         return data("author");
     }
 
@@ -61,17 +62,17 @@ public final class LiveUpdate extends Thing implements Created {
         }
 
         @JsonProperty
-        public String getUrl() {
+        public @Nullable String getUrl() {
             return data("url");
         }
 
         @JsonProperty
-        public Integer getWidth() {
+        public @Nullable Integer getWidth() {
             return data("width", Integer.class);
         }
 
         @JsonProperty
-        public Integer getHeight() {
+        public @Nullable Integer getHeight() {
             return data("height", Integer.class);
         }
     }

@@ -7,6 +7,7 @@ import net.dean.jraw.models.meta.Model;
 
 import java.text.NumberFormat;
 import java.util.Date;
+import org.jspecify.annotations.Nullable;
 
 /** Represents a comment on a Submission */
 @Model(kind = Model.Kind.COMMENT)
@@ -19,20 +20,22 @@ public class Comment extends PublicContribution {
 
     /** Gets who approved this comment, or null if the logged in account is not a moderator */
     @JsonProperty(nullable = true)
-    public String getApprovedBy() {
+    public @Nullable String getApprovedBy() {
         return data("approved_by");
     }
 
     /** Gets the name of the account that posted this comment */
     @JsonProperty
-    public String getAuthor() {
+    public @Nullable String getAuthor() {
         return data("author");
     }
 
     /** Gets the author's subreddit-specific flair. */
     @JsonProperty(nullable = true)
-    public Flair getAuthorFlair() {
-        if (data.get("author_flair_css_class").isNull() && data.get("author_flair_text").isNull())
+    public @Nullable Flair getAuthorFlair() {
+        // hasNonNull rather than get(...).isNull(): get returns null for a key that is absent
+        // rather than present-and-null, and that null was being dereferenced.
+        if (!data.hasNonNull("author_flair_css_class") && !data.hasNonNull("author_flair_text"))
             return null;
         return new Flair(data("author_flair_css_class"), data("author_flair_text"));
     }
@@ -45,13 +48,13 @@ public class Comment extends PublicContribution {
 
     /** Gets who removed this comment, or null if you are not a mod */
     @JsonProperty(nullable = true)
-    public String getBannedBy() {
+    public @Nullable String getBannedBy() {
         return data("banned_by");
     }
 
     /** Gets the body of the comment */
     @JsonProperty
-    public String getBody() {
+    public @Nullable String getBody() {
         return data("body");
     }
 
@@ -64,7 +67,7 @@ public class Comment extends PublicContribution {
      * @see #hasBeenEdited()
      */
     @JsonProperty(nullable = true)
-    public Date getEditDate() {
+    public @Nullable Date getEditDate() {
         if (!data.has("edited")) {
             return null;
         }
@@ -104,19 +107,19 @@ public class Comment extends PublicContribution {
 
     /** Gets the fullname of the user who posted the submission. */
     @JsonProperty(nullable = true)
-    public String getSubmissionAuthor() {
+    public @Nullable String getSubmissionAuthor() {
         return data("link_author");
     }
 
     /** Gets the ID of the submission this comment is located in */
     @JsonProperty
-    public String getSubmissionId() {
+    public @Nullable String getSubmissionId() {
         return data("link_id");
     }
 
     /** Gets the title of the parent link, or null if this comment is not being displayed outside of its own thread */
     @JsonProperty(nullable = true)
-    public String getSubmissionTitle() {
+    public @Nullable String getSubmissionTitle() {
         return data("link_title");
     }
 
@@ -125,18 +128,18 @@ public class Comment extends PublicContribution {
      * thread
      */
     @JsonProperty(nullable = true)
-    public String getUrl() {
+    public @Nullable String getUrl() {
         return data("link_url");
     }
 
     /** Gets the amount of times this comment has been reported, or null if the logged in user is not a mod. */
     @JsonProperty(nullable = true)
-    public Integer getReportCount() {
+    public @Nullable Integer getReportCount() {
         return data("num_reports", Integer.class);
     }
 
     /** Gets the localized amount of times this comment has been reported, or null if the logged in user is not a mod */
-    public String getLocalizedReportCount() {
+    public @Nullable String getLocalizedReportCount() {
         try {
             return NumberFormat.getInstance().format(getReportCount());
         } catch (final IllegalArgumentException ex) {
@@ -149,7 +152,7 @@ public class Comment extends PublicContribution {
      * submission ID will be returned.
      */
     @JsonProperty
-    public String getParentId() {
+    public @Nullable String getParentId() {
         return data("parent_id");
     }
 
@@ -167,13 +170,13 @@ public class Comment extends PublicContribution {
 
     /** The subreddit the comment was posted in, excluding the "/r/" prefix (ex: "pics") */
     @JsonProperty
-    public String getSubredditName() {
+    public @Nullable String getSubredditName() {
         return data("subreddit");
     }
 
     /** The ID of the subreddit in which this comment was posted in */
     @JsonProperty
-    public String getSubredditId() {
+    public @Nullable String getSubredditId() {
         return data("subreddit_id");
     }
 }

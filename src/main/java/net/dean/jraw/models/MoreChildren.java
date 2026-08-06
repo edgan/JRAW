@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class represents a list of Thing IDs. This element, when present, is the last element of a Listing in the JSON
@@ -34,7 +35,7 @@ public final class MoreChildren extends Thing {
      * @return The amount of IDs in this list
      */
     @JsonProperty
-    public Integer getCount() {
+    public @Nullable Integer getCount() {
         return data("count", Integer.class);
     }
 
@@ -42,7 +43,7 @@ public final class MoreChildren extends Thing {
      * Gets the localized amount of IDs in this list
      * @return The localized amount of IDs in this list
      */
-    public String getLocalizedCount() {
+    public @Nullable String getLocalizedCount() {
         try {
             return NumberFormat.getInstance().format(getCount());
         } catch (final IllegalArgumentException ex) {
@@ -55,7 +56,7 @@ public final class MoreChildren extends Thing {
      * submission's fullname.
      */
     @JsonProperty
-    public String getParentId() {
+    public @Nullable String getParentId() {
         return data("parent_id");
     }
 

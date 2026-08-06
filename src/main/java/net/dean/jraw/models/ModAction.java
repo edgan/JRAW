@@ -6,6 +6,7 @@ import net.dean.jraw.models.meta.Model;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Date;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents an administrative action from a moderator of a subreddit
@@ -19,7 +20,7 @@ public final class ModAction extends Thing implements Created {
 
     /** Gets the action's description. May be null if the action is generic such as "sticky" or "unsticky" */
     @JsonProperty(nullable = true)
-    public String getDescription() {
+    public @Nullable String getDescription() {
         return data("description");
     }
 
@@ -29,13 +30,13 @@ public final class ModAction extends Thing implements Created {
      * @see #getModerator()
      */
     @JsonProperty
-    public String getModeratorId() {
+    public @Nullable String getModeratorId() {
         return data("mod_id36");
     }
 
     /** The name of the moderator who did the action */
     @JsonProperty
-    public String getModerator() {
+    public @Nullable String getModerator() {
         return data("mod");
     }
 
@@ -43,7 +44,7 @@ public final class ModAction extends Thing implements Created {
      * The subreddit in which this action occurred. May be null.
      */
     @JsonProperty(nullable = true)
-    public String getSubreddit() {
+    public @Nullable String getSubreddit() {
         return data("subreddit");
     }
 
@@ -52,37 +53,37 @@ public final class ModAction extends Thing implements Created {
      * "/r/jraw_testing2/comments/2m2gnc/self_post_test_epoch1415796343364/"
      */
     @JsonProperty
-    public String getTargetPermalink() {
+    public @Nullable String getTargetPermalink() {
         return data("target_permalink");
     }
 
     /** Gets any extra details about the action. Will be an empty string if there are none. */
     @JsonProperty
-    public String getDetails() {
+    public @Nullable String getDetails() {
         return data("details");
     }
 
     /** Gets the action that was performed. For example, "sticky", "unsticky" */
     @JsonProperty
-    public String getAction() {
+    public @Nullable String getAction() {
         return data("action");
     }
 
     /** The name of the author whose post was targeted */
     @JsonProperty
-    public String getTargetAuthor() {
+    public @Nullable String getTargetAuthor() {
         return data("jraw_test");
     }
 
     /** The username of the author whose post was targeted */
     @JsonProperty
-    public String getTargetFullName() {
+    public @Nullable String getTargetFullName() {
         return data("target_fullname");
     }
 
     /** The subreddit's ID in which this action occurred. For example, "31qvo" */
     @JsonProperty
-    public String getSubredditId() {
+    public @Nullable String getSubredditId() {
         return data("sr_id36");
     }
 

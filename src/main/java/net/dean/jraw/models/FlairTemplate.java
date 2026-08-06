@@ -2,6 +2,7 @@ package net.dean.jraw.models;
 
 import net.dean.jraw.models.meta.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a single flair template on a subreddit
@@ -24,7 +25,7 @@ public final class FlairTemplate extends JsonModel {
      * Gets the ID of this flair template
      */
     @JsonProperty(nullable = true)
-    public String getId() {
+    public @Nullable String getId() {
         return flairData("template_id");
     }
 

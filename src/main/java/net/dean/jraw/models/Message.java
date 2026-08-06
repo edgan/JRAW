@@ -6,6 +6,7 @@ import net.dean.jraw.models.meta.JsonProperty;
 import net.dean.jraw.models.meta.MessageSerializer;
 import net.dean.jraw.models.meta.Model;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class represents any data that can appear in a user's inbox. The two main subclasses of this class are
@@ -25,18 +26,18 @@ public abstract class Message extends Contribution implements Distinguishable {
     }
 
     @JsonProperty
-    public String getAuthor() {
+    public @Nullable String getAuthor() {
         return data("author");
     }
 
     @JsonProperty
-    public String getBody() {
+    public @Nullable String getBody() {
         return data("body");
     }
 
     /** Gets the fullname of the first message's ID */
     @JsonProperty
-    public String getFirstMessage() {
+    public @Nullable String getFirstMessage() {
         return data("first_message_name");
     }
 
@@ -56,13 +57,13 @@ public abstract class Message extends Contribution implements Distinguishable {
      * @return The fullname of the host, or null if this is a top-level comment or private message.
      */
     @JsonProperty(nullable = true)
-    public String getParentId() {
+    public @Nullable String getParentId() {
         return data("parent_id");
     }
 
     /** Gets the subject of the message */
     @JsonProperty
-    public String getSubject() {
+    public @Nullable String getSubject() {
         return data("subject");
     }
 
@@ -71,7 +72,7 @@ public abstract class Message extends Contribution implements Distinguishable {
      * @return The subreddit this was posted in, or null if this message is not a comment
      */
     @JsonProperty(nullable = true)
-    public String getSubreddit() {
+    public @Nullable String getSubreddit() {
         return data("subreddit");
     }
 

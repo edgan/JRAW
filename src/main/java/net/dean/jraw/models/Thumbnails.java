@@ -2,6 +2,7 @@ package net.dean.jraw.models;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.dean.jraw.models.meta.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Variations of thumbnails for an image.
@@ -12,7 +13,7 @@ public class Thumbnails extends JsonModel {
     }
 
     @JsonProperty
-    public String getId() {
+    public @Nullable String getId() {
         return data("id");
     }
 

@@ -6,6 +6,7 @@ import net.dean.jraw.models.meta.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Date;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class represents the data provided from a successful request to {@code /api/v1/access_token}. See
@@ -25,7 +26,7 @@ public class OAuthData extends JsonModel {
     }
 
     @JsonProperty
-    public String getAccessToken() {
+    public @Nullable String getAccessToken() {
         return data("access_token");
     }
 
@@ -34,7 +35,7 @@ public class OAuthData extends JsonModel {
      * @return The string "bearer"
      */
     @JsonProperty
-    public String getTokenType() {
+    public @Nullable String getTokenType() {
         return data("token_type");
     }
 
@@ -62,7 +63,7 @@ public class OAuthData extends JsonModel {
      * authorization. See {@link OAuthHelper#getAuthorizationUrl(Credentials, boolean, boolean, String...)}
      */
     @JsonProperty(nullable = true)
-    public String getRefreshToken() {
+    public @Nullable String getRefreshToken() {
         return data("refresh_token");
     }
 

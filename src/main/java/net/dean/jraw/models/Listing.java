@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A Listing is how the reddit API returns paginated data. A Listing has three main parts: the fullnames of the items
@@ -100,19 +101,19 @@ public class Listing<T extends RedditObject> extends RedditObject implements Lis
 
     /** Gets the "more" element (the last element in the children) */
     @JsonProperty(nullable = true)
-    public MoreChildren getMoreChildren() {
+    public @Nullable MoreChildren getMoreChildren() {
         return moreChildren;
     }
 
     /** Gets the fullname of the Thing that comes before this page, or null if there is no previous page */
     @JsonProperty(nullable = true)
-    public String getBefore() {
+    public @Nullable String getBefore() {
         return before;
     }
 
     /** Gets the fullname of the Thing that follows after this page, or null if there is no following page */
     @JsonProperty(nullable = true)
-    public String getAfter() {
+    public @Nullable String getAfter() {
         return after;
     }
 

@@ -9,6 +9,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a live thread. See <a href="https://www.reddit.com/r/live/wiki/index">here</a> for more information.
@@ -26,13 +27,13 @@ public final class LiveThread extends RedditObject implements Created {
 
     /** Gets the thread's description */
     @JsonProperty
-    public String getDescription() {
+    public @Nullable String getDescription() {
         return data("description");
     }
 
     /** Gets the thread's title */
     @JsonProperty
-    public String getTitle() {
+    public @Nullable String getTitle() {
         return data("title");
     }
 
@@ -41,7 +42,7 @@ public final class LiveThread extends RedditObject implements Created {
      * updates.
      */
     @JsonProperty(nullable = true)
-    public String getWebsocketUrl() {
+    public @Nullable String getWebsocketUrl() {
         return data("websocket_url");
     }
 
@@ -53,12 +54,12 @@ public final class LiveThread extends RedditObject implements Created {
 
     /** Gets the amount of people watching this thread */
     @JsonProperty
-    public Integer getViewerCount() {
+    public @Nullable Integer getViewerCount() {
         return data("viewer_count", Integer.class);
     }
 
     /** Gets the localized amount of people watching this thread */
-    public String getLocalizedViewerCount() {
+    public @Nullable String getLocalizedViewerCount() {
         try {
             return NumberFormat.getInstance().format(getViewerCount());
         } catch (final IllegalArgumentException ex) {
@@ -74,13 +75,13 @@ public final class LiveThread extends RedditObject implements Created {
 
     /** This LiveEvent's ID. Not to be confused with {@link Thing#getId()}. */
     @JsonProperty
-    public String getId() {
+    public @Nullable String getId() {
         return data("id");
     }
 
     /** Any additional information provided by the updaters for the viewers' benefit. */
     @JsonProperty
-    public String getResources() {
+    public @Nullable String getResources() {
         return data("resources");
     }
 

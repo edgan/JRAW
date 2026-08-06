@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a collection of subreddits. See <a href="http://www.reddit.com/r/multihub">here</a> for some examples.
@@ -30,7 +31,7 @@ public final class MultiReddit extends Thing implements Created {
 
     @Override
     @JsonProperty
-    public String getFullName() {
+    public @Nullable String getFullName() {
         return data("name");
     }
 
@@ -61,17 +62,17 @@ public final class MultiReddit extends Thing implements Created {
 
     /** Gets this multireddit's description, formatted with Markdown. */
     @JsonProperty
-    public String getDescription() {
+    public @Nullable String getDescription() {
         return data("description_md");
     }
 
     @JsonProperty
-    public String getOrigin() {
+    public @Nullable String getOrigin() {
         return data("copied_from");
     }
 
     @JsonProperty(nullable = true)
-    public String getIconUrl() {
+    public @Nullable String getIconUrl() {
         return data("icon_url");
     }
 
@@ -81,12 +82,12 @@ public final class MultiReddit extends Thing implements Created {
     }
 
     @JsonProperty
-    public String getKeyColor() {
+    public @Nullable String getKeyColor() {
         return data("key_color");
     }
 
     @JsonProperty
-    public String getDisplayName() {
+    public @Nullable String getDisplayName() {
         return data("display_name");
     }
 

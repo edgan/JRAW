@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.dean.jraw.models.attr.Created;
 
 import java.util.Date;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Class implementing a basic Subreddit Rule
@@ -34,7 +35,12 @@ public class SubredditRule extends JsonModel implements Created {
      *
      * @return The kind of rule
      */
-    public RuleKind getKind() {
+    public @Nullable RuleKind getKind() {
+        // A rule with no "kind" is not one of the three below, which is what the trailing null
+        // already reports; reading the absent key without this test threw instead.
+        if (!getDataNode().hasNonNull("kind")) {
+            return null;
+        }
         switch (getDataNode().get("kind").asText()) {
             case "link":
                 return RuleKind.LINK;

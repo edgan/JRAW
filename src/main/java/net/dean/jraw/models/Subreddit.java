@@ -7,6 +7,7 @@ import net.dean.jraw.models.meta.Model;
 import net.dean.jraw.util.Dimension;
 
 import java.text.NumberFormat;
+import org.jspecify.annotations.Nullable;
 
 /** This class represents a subreddit, such as /r/pics. */
 @Model(kind = Model.Kind.SUBREDDIT)
@@ -19,12 +20,12 @@ public final class Subreddit extends Thing implements Comparable<Subreddit> {
 
     /** Gets the amount of active users this subreddit has seen in the last 15 minutes */
     @JsonProperty
-    public Integer getAccountsActive() {
+    public @Nullable Integer getAccountsActive() {
         return data("accounts_active", Integer.class);
     }
 
     /** Gets the localized amount of active users this subreddit has seen in the last 15 minutes */
-    public String getLocalizedAccountsActive() {
+    public @Nullable String getLocalizedAccountsActive() {
         try {
             return NumberFormat.getInstance().format(getAccountsActive());
         } catch (final IllegalArgumentException ex) {
@@ -34,7 +35,7 @@ public final class Subreddit extends Thing implements Comparable<Subreddit> {
 
     /** Gets the number of minutes the subreddit will initially hide comment scores for */
     @JsonProperty
-    public Integer getCommentScoreHideDuration() {
+    public @Nullable Integer getCommentScoreHideDuration() {
         return data("comment_score_hide_mins", Integer.class);
     }
 
@@ -42,25 +43,25 @@ public final class Subreddit extends Thing implements Comparable<Subreddit> {
      * Gets the subreddit's description. This appears on the sidebar on the website.
      */
     @JsonProperty
-    public String getSidebar() {
+    public @Nullable String getSidebar() {
         return data("description");
     }
 
     /** Gets the "human readable" name of the subreddit (ex: "pics") */
     @JsonProperty
-    public String getDisplayName() {
+    public @Nullable String getDisplayName() {
         return data("display_name");
     }
 
     /** Gets the full URL to the header image, or null if one is not present. */
     @JsonProperty(nullable = true)
-    public String getHeaderImage() {
+    public @Nullable String getHeaderImage() {
         return data("header_img");
     }
 
     /** Gets the dimensions of the header image, or null if the header does not exist */
     @JsonProperty(nullable = true)
-    public Dimension getHeaderSize() {
+    public @Nullable Dimension getHeaderSize() {
         return _getHeaderSize();
     }
 
@@ -69,7 +70,7 @@ public final class Subreddit extends Thing implements Comparable<Subreddit> {
      * not present
      */
     @JsonProperty(nullable = true)
-    public String getHeaderTitle() {
+    public @Nullable String getHeaderTitle() {
         return data("header_title");
     }
 
@@ -87,7 +88,7 @@ public final class Subreddit extends Thing implements Comparable<Subreddit> {
 
     /** Gets the information that will show when this subreddit appears in a search */
     @JsonProperty
-    public String getPublicDescription() {
+    public @Nullable String getPublicDescription() {
         return data("public_description");
     }
 
@@ -99,12 +100,12 @@ public final class Subreddit extends Thing implements Comparable<Subreddit> {
 
     /** Gets the amount of users subscribed to this subreddit */
     @JsonProperty
-    public Long getSubscriberCount() {
+    public @Nullable Long getSubscriberCount() {
         return data("subscribers", Long.class);
     }
 
     /** Gets the localized amount of users subscribed to this subreddit */
-    public String getLocalizedSubscriberCount() {
+    public @Nullable String getLocalizedSubscriberCount() {
         try {
             return NumberFormat.getInstance().format(getSubscriberCount());
         } catch (final IllegalArgumentException ex) {
@@ -124,13 +125,13 @@ public final class Subreddit extends Thing implements Comparable<Subreddit> {
 
     /** Gets the subreddit's custom label for the "submit link" button, if any. */
     @JsonProperty
-    public String getSubmitLinkLabel() {
+    public @Nullable String getSubmitLinkLabel() {
         return data("submit_link_label");
     }
 
     /** Gets the subreddit's custom label for the "submit text" button, if any */
     @JsonProperty
-    public String getSubmitTextLabel() {
+    public @Nullable String getSubmitTextLabel() {
         return data("submit_text_label");
     }
 
@@ -145,13 +146,13 @@ public final class Subreddit extends Thing implements Comparable<Subreddit> {
     }
 
     @JsonProperty
-    public String getTitle() {
+    public @Nullable String getTitle() {
         return data("title");
     }
 
     /** Gets the relative URL of the subreddit (ex: "/r/pics") */
     @JsonProperty
-    public String getRelativeLocation() {
+    public @Nullable String getRelativeLocation() {
         return data("url");
     }
 
@@ -181,7 +182,7 @@ public final class Subreddit extends Thing implements Comparable<Subreddit> {
 
     /** Gets the URL to the banner displayed at the top of the subreddit. May be empty if none is available. */
     @JsonProperty
-    public String getBannerImage() {
+    public @Nullable String getBannerImage() {
         return data("banner_img", String.class);
     }
 

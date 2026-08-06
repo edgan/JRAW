@@ -1,6 +1,8 @@
 apply plugin: 'java'
 
-ext.genJavaClass = file("$generatedJavaSrc/net/dean/jraw/Endpoints.java")
+// Explicitly rootProject: an unqualified reference resolves by implicit parent lookup, which
+// Gradle 10 removes.
+ext.genJavaClass = file("${rootProject.ext.generatedJavaSrc}/net/dean/jraw/Endpoints.java")
 
 dependencies {
     implementation 'org.javassist:javassist:3.18.2-GA'
@@ -10,7 +12,8 @@ dependencies {
     implementation project(':')
 }
 
-task update(type: JavaExec, dependsOn: compileJava) {
+tasks.register('update', JavaExec) {
+    dependsOn tasks.named('compileJava')
     mainClass.set("net.dean.jraw.endpoints.EndpointAnalyzer")
     classpath = sourceSets.main.runtimeClasspath
 

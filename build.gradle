@@ -2,22 +2,25 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'jacoco'
-    id 'com.github.kt3k.coveralls' version '2.4.0x'
 }
 
 wrapper {
-    gradleVersion = '8.11.1'
+    gradleVersion = '9.6.1'
 }
 
 ext {
-    releaseDest = new File(project.buildDir, "releases")
+    releaseDest = layout.buildDirectory.dir("releases")
     generatedJavaSrc = file("src/gen/java/")
 }
 
 allprojects {
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
+    // withType rather than a bare java{} block: allprojects runs before :endpoints' own build
+    // script applies the java plugin, so a direct reference resolves against the root project.
+    plugins.withType(JavaPlugin).configureEach {
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(25)
+            }
         }
     }
     group = 'net.dean.jraw'
@@ -27,7 +30,13 @@ allprojects {
         mavenCentral()
     }
 
-    compileJava.options.encoding = 'UTF-8'
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        // Built with JDK 25, but emitting Java 24 bytecode: Slide compiles its own sources at
+        // VERSION_24 and AGP's R8 has to read this jar. Raising this past what the consumer
+        // targets is what breaks dexing, not the toolchain version.
+        options.release = 24
+    }
 }
 
 dependencies {
@@ -37,6 +46,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
     implementation 'com.google.guava:guava:19.0'
     implementation 'org.slf4j:slf4j-api:1.7.13'
+    // Annotations only: they are recorded as type annotations on the methods themselves, so
+    // consumers read them straight out of the bytecode without needing jspecify on their own
+    // classpath. compileOnly keeps it out of the POM.
+    compileOnly 'org.jspecify:jspecify:1.0.1'
     testImplementation 'org.slf4j:slf4j-simple:1.7.13'
     testImplementation 'org.testng:testng:6.9.10'
     testImplementation 'net.sourceforge.htmlunit:htmlunit:2.19'
@@ -45,35 +58,46 @@ dependencies {
 // Add the generated source to the main Java source directories
 sourceSets.main.java.srcDir ext.generatedJavaSrc
 
-task fatJar(type: Jar, dependsOn: assemble) {
+tasks.register('fatJar', Jar) {
+    dependsOn tasks.named('assemble')
     archiveClassifier.set('fat')
     destinationDirectory.set(releaseDest)
-    from(
-            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) },
-            sourceSets.main.output
-    )
+    // okhttp and okio both ship META-INF/versions/9/OSGI-INF/MANIFEST.MF, and merging their jars
+    // without a strategy is a hard error rather than a warning, so this task could never run.
+    // EXCLUDE keeps the first copy, which is what a fat jar wants for OSGi metadata it ignores.
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    from sourceSets.main.output
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+tasks.register('javadocJar', Jar) {
+    def javadocTask = tasks.named('javadoc', Javadoc)
+    dependsOn javadocTask
     archiveClassifier.set('javadoc')
     destinationDirectory.set(releaseDest)
-    from javadoc.destinationDir  // Keep this as is
+    from javadocTask.map { it.destinationDir }
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
+tasks.register('sourcesJar', Jar) {
+    dependsOn tasks.named('classes')
     archiveClassifier.set('sources')
     destinationDirectory.set(releaseDest)
     from sourceSets.main.allSource
 }
 
-task renamePom(dependsOn: 'generatePomFileForMavenPublication') {
+tasks.register('renamePom') {
+    dependsOn tasks.named('generatePomFileForMavenPublication')
+    def pomDir = layout.buildDirectory.dir("publications/maven")
+    def pomVersion = version
     doLast {
-        println(file('build/publications/maven/pom-default.xml'))
-        file('build/publications/maven/pom-default.xml').renameTo("build/publications/maven/JRAW-${version}.pom")
+        def pom = pomDir.get().file("pom-default.xml").asFile
+        println(pom)
+        pom.renameTo(new File(pom.parentFile, "JRAW-${pomVersion}.pom"))
     }
 }
 
-task release(type: Jar, dependsOn: ['fatJar', 'javadocJar', 'sourcesJar', 'renamePom']) {
+tasks.register('release', Jar) {
+    dependsOn 'fatJar', 'javadocJar', 'sourcesJar', 'renamePom'
     from sourceSets.main.output
     destinationDirectory.set(releaseDest)
 }
@@ -88,18 +112,16 @@ test {
     useTestNG()
 
     testLogging {
-        // Show stderr and stdout (useful for exceptions)
+        // Show stderr and stdout (useful for exceptions), and name each test as it starts --
+        // the events list replaces a beforeTest closure, which Gradle 10 removes.
         showStandardStreams = true
-    }
-
-    beforeTest { descriptor ->
-        logger.lifecycle("Running test: ${descriptor.className}.${descriptor.name}")
+        events "started", "passed", "skipped", "failed"
     }
 }
 
 jacocoTestReport {
     reports {
-        xml.required.set(true) // coveralls depends on XML reports
+        xml.required.set(true)
         html.required.set(true)
     }
 }
@@ -110,11 +132,6 @@ publishing {
             from components.java
         }
     }
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
 }
 
 defaultTasks "test"

@@ -1,2 +1,8 @@
-include ':endpoints'
+plugins {
+    // Lets Gradle provision the Java 25 toolchain itself. jitpack launches Gradle on whatever JDK
+    // jitpack.yml names, which need not be 25 -- without this, a builder with no local 25 fails
+    // instead of downloading one.
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
 
+include ':endpoints'

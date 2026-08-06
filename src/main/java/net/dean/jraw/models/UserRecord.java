@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class represents a small bit of data relevant to moderation logs such as banned users, accepted contributors,
@@ -33,7 +34,7 @@ public final class UserRecord extends Thing {
      * @return The date most relevant to this record
      */
     @JsonProperty
-    public Date getDate() {
+    public @Nullable Date getDate() {
         return data("date", Date.class);
     }
 
@@ -42,7 +43,7 @@ public final class UserRecord extends Thing {
      * @return A list that this moderator has on this subreddit
      */
     @JsonProperty(nullable = true)
-    public List<ModPermission> getModPermissions() {
+    public @Nullable List<ModPermission> getModPermissions() {
         if (!data.has("mod_permissions")) {
             return null;
         }
@@ -63,7 +64,7 @@ public final class UserRecord extends Thing {
      * @return The explanation for the banning
      */
     @JsonProperty(nullable = true)
-    public String getNote() {
+    public @Nullable String getNote() {
         return data("note");
     }
 

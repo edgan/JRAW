@@ -3,6 +3,7 @@ package net.dean.jraw.models;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.dean.jraw.models.meta.JsonProperty;
 import net.dean.jraw.models.meta.Model;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The Thing class is the base class for most data structures returned by the reddit API. Every Thing has an
@@ -23,13 +24,13 @@ public abstract class Thing extends RedditObject {
 
     /** Gets this Thing's unique identifier, e.g. "8xwlg" */
     @JsonProperty
-    public String getId() {
+    public @Nullable String getId() {
         return data("id");
     }
 
     /** Gets this Thing's fullname, e.g. "t1_c3v7f8u" */
     @JsonProperty
-    public String getFullName() {
+    public @Nullable String getFullName() {
         return data("name");
     }
 

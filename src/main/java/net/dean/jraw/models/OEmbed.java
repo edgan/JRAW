@@ -4,6 +4,7 @@ import net.dean.jraw.models.meta.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.net.URL;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents media provided by an oEmbed-style JSON object. Documentation in this class is borrowed heavily from the
@@ -18,7 +19,7 @@ public final class OEmbed extends JsonModel {
 
     /** The resource's MIME type. */
     @JsonProperty
-    public MediaType getMediaType() {
+    public @Nullable MediaType getMediaType() {
         String typeString = data("type");
 
         for (MediaType t : MediaType.values()) {
@@ -32,37 +33,37 @@ public final class OEmbed extends JsonModel {
 
     /** Gets a text title that describes the resource */
     @JsonProperty(nullable = true)
-    public String getTitle() {
+    public @Nullable String getTitle() {
         return data("title");
     }
 
     /** Gets the oEmbed version number. This must be 1.0. */
     @JsonProperty(nullable = true)
-    public String getVersion() {
+    public @Nullable String getVersion() {
         return data("version");
     }
 
     /** Gets the name of the author/owner of the resource. */
     @JsonProperty(nullable = true)
-    public String getAuthorName() {
+    public @Nullable String getAuthorName() {
         return data("author_name");
     }
 
     /** Gets a URL for the author/owner of the resource. */
     @JsonProperty(nullable = true)
-    public String getAuthorUrl() {
+    public @Nullable String getAuthorUrl() {
         return data("author_url");
     }
 
     /** Gets the name of the resource provider. */
     @JsonProperty(nullable = true)
-    public String getProviderName() {
+    public @Nullable String getProviderName() {
         return data("provider_name");
     }
 
     /** Gets the URL of the resource provider. */
     @JsonProperty(nullable = true)
-    public String getProviderUrl() {
+    public @Nullable String getProviderUrl() {
         return data("provider_url");
     }
 
@@ -71,13 +72,13 @@ public final class OEmbed extends JsonModel {
      * not.
      */
     @JsonProperty(nullable = true)
-    public Integer getCacheAge() {
+    public @Nullable Integer getCacheAge() {
         return data("cache_age", Integer.class);
     }
 
     /** Gets the thumbnail associated with this resource. Can be null. */
     @JsonProperty(nullable = true)
-    public Thumbnail getThumbnail() {
+    public @Nullable Thumbnail getThumbnail() {
         if (!data.has("thumbnail_url")) {
             return null;
         }
@@ -91,7 +92,7 @@ public final class OEmbed extends JsonModel {
      * not {@link MediaType#LINK}.
      */
     @JsonProperty(nullable = true)
-    public Integer getWidth() {
+    public @Nullable Integer getWidth() {
         return data("width", Integer.class);
     }
 
@@ -100,7 +101,7 @@ public final class OEmbed extends JsonModel {
      * not {@link MediaType#LINK}.
      */
     @JsonProperty(nullable = true)
-    public Integer getHeight() {
+    public @Nullable Integer getHeight() {
         return data("height", Integer.class);
     }
 
@@ -108,7 +109,7 @@ public final class OEmbed extends JsonModel {
      * Gets the source URL of the image. Present when the media type is {@link MediaType#PHOTO}.
      */
     @JsonProperty(nullable = true)
-    public String getUrl() {
+    public @Nullable String getUrl() {
         return data("url");
     }
 
@@ -117,7 +118,7 @@ public final class OEmbed extends JsonModel {
      * media type is {@link MediaType#VIDEO} or {@link MediaType#RICH}.
      */
     @JsonProperty(nullable = true)
-    public String getHtml() {
+    public @Nullable String getHtml() {
         return data("html");
     }
 

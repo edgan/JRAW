@@ -7,6 +7,7 @@ import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Thing;
 
 import java.util.*;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides the ability to iterate through data provided by the Reddit API.
@@ -192,7 +193,7 @@ public abstract class Paginator<T extends Thing> implements RedditIterable<T> {
         return sorting;
     }
 
-    protected String getSortingString() {
+    protected @Nullable String getSortingString() {
         if (timePeriod == null || !(sorting == Sorting.CONTROVERSIAL || sorting == Sorting.TOP)) return null;
         return sorting.name().toLowerCase();
     }

@@ -1,5 +1,6 @@
 package net.dean.jraw.auth;
 
+import org.jspecify.annotations.Nullable;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.oauth.Credentials;
 import net.dean.jraw.http.oauth.OAuthData;
@@ -114,7 +115,7 @@ public final class AuthenticationManager {
             tokenHandler.writeToken(getUsername(), o.getRefreshToken());
     }
 
-    private String getUsername() {
+    private @Nullable String getUsername() {
         if (!reddit.isAuthenticated()) {
             if (tokenHandler.hasLastAuthenticated()) {
                 try {

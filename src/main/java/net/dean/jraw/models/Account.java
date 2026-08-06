@@ -6,6 +6,7 @@ import net.dean.jraw.models.meta.Model;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Date;
+import org.jspecify.annotations.Nullable;
 
 /** Represents a user's account. */
 @Model(kind = Model.Kind.ACCOUNT)
@@ -17,7 +18,7 @@ public class Account extends Thing implements Created {
 
     /** Gets the user's comment karma */
     @JsonProperty
-    public Integer getCommentKarma() {
+    public @Nullable Integer getCommentKarma() {
         return data("comment_karma", Integer.class);
     }
 
@@ -41,7 +42,7 @@ public class Account extends Thing implements Created {
 
     /** Gets the user's link karma */
     @JsonProperty
-    public Integer getLinkKarma() {
+    public @Nullable Integer getLinkKarma() {
         return data("link_karma", Integer.class);
     }
 

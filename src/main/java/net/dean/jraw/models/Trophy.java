@@ -4,6 +4,7 @@ import net.dean.jraw.RedditClient;
 import net.dean.jraw.models.meta.JsonProperty;
 import net.dean.jraw.models.meta.Model;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a trophy displayed in a user's trophy case
@@ -21,31 +22,31 @@ public final class Trophy extends Thing {
 
     /** The URL to the 70x70 version of the icon */
     @JsonProperty
-    public String getIcon() {
+    public @Nullable String getIcon() {
         return data("icon_70");
     }
 
     /** The URL to the 40x40 version of the icon */
     @JsonProperty
-    public String getIconSmall() {
+    public @Nullable String getIconSmall() {
         return data("icon_40");
     }
 
     /** Optional text that describes to what degree the award was achieved */
     @JsonProperty(nullable = true)
-    public String getDescription() {
+    public @Nullable String getDescription() {
         return data("description");
     }
 
     /** The award's ID (different than the normal ID) */
     @JsonProperty
-    public String getTrophyId() {
+    public @Nullable String getTrophyId() {
         return data("award_id");
     }
 
     /** An external link explaining this award */
     @JsonProperty
-    public String getAboutUrl() {
+    public @Nullable String getAboutUrl() {
         return data("url");
     }
 }

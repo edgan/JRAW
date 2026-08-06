@@ -9,6 +9,7 @@ import net.dean.jraw.util.JrawUtils;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents content that the user has submitted, whether that be a self post or a link. More information can be found
@@ -40,26 +41,28 @@ public final class Submission extends PublicContribution {
 
     /** Gets who approved this submission, or null if the logged in account is not a moderator */
     @JsonProperty(nullable = true)
-    public String getApprovedBy() {
+    public @Nullable String getApprovedBy() {
         return data("approved_by");
     }
 
     /** Gets who removed this submission, or null if you are not a mod */
     @JsonProperty(nullable = true)
-    public String getBannedBy() {
+    public @Nullable String getBannedBy() {
         return data("banned_by");
     }
 
     /** Gets the name of the poster, or null if this is a promotional link */
     @JsonProperty
-    public String getAuthor() {
+    public @Nullable String getAuthor() {
         return data("author");
     }
 
     /** Gets the flair used for the poster of the link (subreddit specific) */
     @JsonProperty(nullable = true)
-    public Flair getAuthorFlair() {
-        if (data.get("author_flair_css_class").isNull() && data.get("author_flair_text").isNull())
+    public @Nullable Flair getAuthorFlair() {
+        // hasNonNull rather than get(...).isNull(): get returns null for a key that is absent
+        // rather than present-and-null, and that null was being dereferenced.
+        if (!data.hasNonNull("author_flair_css_class") && !data.hasNonNull("author_flair_text"))
             return null;
         return new Flair(data("author_flair_css_class"),
                 data("author_flair_text"));
@@ -76,7 +79,7 @@ public final class Submission extends PublicContribution {
      * Gets the domain of this link. Self posts will be "self.{subreddit}".
      */
     @JsonProperty
-    public String getDomain() {
+    public @Nullable String getDomain() {
         return data("domain");
     }
 
@@ -113,7 +116,7 @@ public final class Submission extends PublicContribution {
      * @return Gets the ratio of upvotes to downvotes
      */
     @JsonProperty
-    public Double getUpvoteRatio() {
+    public @Nullable Double getUpvoteRatio() {
         return data("upvote_ratio", Double.class);
     }
 
@@ -132,11 +135,17 @@ public final class Submission extends PublicContribution {
      * @return Gets the oEmbed data of this submission
      */
     @JsonProperty(nullable = true)
-    public OEmbed getOEmbedMedia() {
+    public @Nullable OEmbed getOEmbedMedia() {
         if (!data.has("media")) return null;
         if (data.get("media").size() == 0) return null;
 
-        return new OEmbed(data.get("media").get("oembed"));
+        // A reddit-hosted video has "media" populated with reddit_video and no "oembed" at all.
+        // Wrapping that absent child would hand back a non-null OEmbed whose every accessor
+        // throws, where this already reports "no oembed data" as null.
+        JsonNode oembed = data.get("media").get("oembed");
+        if (oembed == null || oembed.isNull()) return null;
+
+        return new OEmbed(oembed);
     }
 
     /**
@@ -144,7 +153,7 @@ public final class Submission extends PublicContribution {
      * @return Gets the total number of comments that belong to this submission
      */
     @JsonProperty
-    public Integer getCommentCount() {
+    public @Nullable Integer getCommentCount() {
         return data("num_comments", Integer.class);
     }
 
@@ -152,7 +161,7 @@ public final class Submission extends PublicContribution {
      * Gets the localized number of comments that belong to this submission. Includes removed comments.
      * @return Gets the total number of comments that belong to this submission localized for the current locale
      */
-    public String getLocalizedCommentCount() {
+    public @Nullable String getLocalizedCommentCount() {
         try {
             return NumberFormat.getInstance().format(getCommentCount());
         } catch (final IllegalArgumentException ex) {
@@ -174,7 +183,7 @@ public final class Submission extends PublicContribution {
      * @return Gets the permalink of this submission
      */
     @JsonProperty
-    public String getPermalink() {
+    public @Nullable String getPermalink() {
         return data("permalink");
     }
 
@@ -193,7 +202,7 @@ public final class Submission extends PublicContribution {
      * @return Gets the raw text of the self post
      */
     @JsonProperty
-    public String getSelftext() {
+    public @Nullable String getSelftext() {
         return data("selftext");
     }
 
@@ -202,7 +211,7 @@ public final class Submission extends PublicContribution {
      * @return Gets the subreddit that the submission was posted in
      */
     @JsonProperty
-    public String getSubredditName() {
+    public @Nullable String getSubredditName() {
         return data("subreddit");
     }
 
@@ -211,7 +220,7 @@ public final class Submission extends PublicContribution {
      * @return Gets the fullname of the subreddit
      */
     @JsonProperty
-    public String getSubredditId() {
+    public @Nullable String getSubredditId() {
         return data("subreddit_id");
     }
 
@@ -220,7 +229,10 @@ public final class Submission extends PublicContribution {
      * @return Gets the URL to this submission's thumbnail
      */
     @JsonProperty(nullable = true)
-    public String getThumbnail() {
+    public @Nullable String getThumbnail() {
+        if (!data.has("thumbnail")) {
+            return null;
+        }
         String thumb = data.get("thumbnail").textValue();
         if (getThumbnailType() != ThumbnailType.URL) {
             return null;
@@ -266,7 +278,7 @@ public final class Submission extends PublicContribution {
      * @return Gets the title of the submission
      */
     @JsonProperty
-    public String getTitle() {
+    public @Nullable String getTitle() {
         return data("title");
     }
 
@@ -275,13 +287,17 @@ public final class Submission extends PublicContribution {
      * @return This submission's URL
      */
     @JsonProperty
-    public String getUrl() {
+    public @Nullable String getUrl() {
         return data("url");
     }
 
     /** Gets the date in UTC when this submission was edited, null if it has not been edited */
     @JsonProperty
-    public Date getEdited() {
+    public @Nullable Date getEdited() {
+        // Comment.getEditDate() already guards this; the same key is optional here too.
+        if (!data.has("edited")) {
+            return null;
+        }
         JsonNode node = data.get("edited");
 
         // "edited" is false if it hasn't been edited, so return null instead
@@ -294,7 +310,7 @@ public final class Submission extends PublicContribution {
 
     /** Gets this Submission's root CommentNode. See {@link CommentNode} for more information about this node. */
     @JsonProperty(nullable = true)
-    public CommentNode getComments() {
+    public @Nullable CommentNode getComments() {
         return rootNode;
     }
 
@@ -318,9 +334,11 @@ public final class Submission extends PublicContribution {
      * suggested sorting for an AMA. May be null.
      */
     @JsonProperty(nullable = true)
-    public CommentSort getSuggestedSort() {
+    public @Nullable CommentSort getSuggestedSort() {
         String key = "suggested_sort";
-        if (data.get(key).isNull()) {
+        // hasNonNull rather than get(key).isNull(): a submission with no suggested sort can omit
+        // the key entirely, and get returns null for that rather than a NullNode.
+        if (!data.hasNonNull(key)) {
             return null;
         }
         try {
@@ -348,12 +366,19 @@ public final class Submission extends PublicContribution {
      * Get the thumbnails for this submission, if any. May return null.
      */
     @JsonProperty(nullable = true)
-    public Thumbnails getThumbnails() {
+    public @Nullable Thumbnails getThumbnails() {
         String key = "preview";
         if (!data.has(key) || data.get(key).isNull()) {
             return null;
         }
-        return new Thumbnails(data.get(key).get("images").get(0));
+        // "images" can be absent, or present and empty. get(0) yields null for both, and
+        // Thumbnails wraps a null node without complaint -- so the caller would get a non-null
+        // object whose every accessor throws, rather than the null this already returns.
+        JsonNode images = data.get(key).get("images");
+        if (images == null || images.size() == 0) {
+            return null;
+        }
+        return new Thumbnails(images.get(0));
     }
 
     /** Gets a URL on the redd.it domain. For example, <a href="http://redd.it/92dd8">http://redd.it/92dd8</a> */
@@ -381,7 +406,7 @@ public final class Submission extends PublicContribution {
         return _getScore();
     }
 
-    public String getLocalizedScore() {
+    public @Nullable String getLocalizedScore() {
         try {
             return NumberFormat.getInstance().format(getScore());
         } catch (final IllegalArgumentException ex) {

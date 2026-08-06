@@ -11,6 +11,7 @@ import net.dean.jraw.models.meta.Model;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class is used to separate public contributions (submissions and comments) from private contributions (messages)
@@ -24,7 +25,7 @@ public abstract class PublicContribution extends Contribution implements Disting
 
     /** Gets a map of reasons to the amount of times reported for that reason by normal users (non-moderators) */
     @JsonProperty(nullable = true)
-    public Map<String, Integer> getUserReports() {
+    public @Nullable Map<String, Integer> getUserReports() {
         if (!data.has("user_reports")) {
             return null;
         }
@@ -38,7 +39,7 @@ public abstract class PublicContribution extends Contribution implements Disting
 
     /** Gets a map of reasons to the moderator that used that reason to report this submission */
     @JsonProperty(nullable = true)
-    public Map<String, String> getModeratorReports() {
+    public @Nullable Map<String, String> getModeratorReports() {
         if (!data.has("mod_reports")) {
             return null;
         }
@@ -76,7 +77,7 @@ public abstract class PublicContribution extends Contribution implements Disting
         return _getScore();
     }
 
-    public String getLocalizedScore() {
+    public @Nullable String getLocalizedScore() {
         try {
             return NumberFormat.getInstance().format(getScore());
         } catch (final IllegalArgumentException ex) {
@@ -101,7 +102,7 @@ public abstract class PublicContribution extends Contribution implements Disting
      * Gets removal reason for this contribution.
      */
     @JsonProperty(nullable = true)
-    public String getRemovalReason() {
+    public @Nullable String getRemovalReason() {
         return data("removal_reason");
     }
 }

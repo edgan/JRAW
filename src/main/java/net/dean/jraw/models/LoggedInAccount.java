@@ -6,6 +6,7 @@ import net.dean.jraw.models.meta.JsonProperty;
 import net.dean.jraw.models.meta.Model;
 
 import java.text.NumberFormat;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents an account with additional information visible only to the logged-in user.
@@ -37,12 +38,12 @@ public final class LoggedInAccount extends Account {
 
     /** Gets the amount of non-moderator mail the user has. */
     @JsonProperty
-    public Integer getInboxCount() {
+    public @Nullable Integer getInboxCount() {
         return data("inbox_count", Integer.class);
     }
 
     /** Gets the localized amount of non-moderator mail the user has. */
-    public String getLocalizedInboxCount() {
+    public @Nullable String getLocalizedInboxCount() {
         try {
             return NumberFormat.getInstance().format(getInboxCount());
         } catch (final IllegalArgumentException ex) {
@@ -52,7 +53,7 @@ public final class LoggedInAccount extends Account {
 
     /** Gets the amount of gold creddits (one month worth of reddit gold) the user has. */
     @JsonProperty
-    public Integer getCreddits() {
+    public @Nullable Integer getCreddits() {
         return data("gold_creddits", Integer.class);
     }
 }
