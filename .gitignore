@@ -21,3 +21,5 @@ bin/
 
 # Local properties file
 local.properties
+
+backup/
