@@ -88,7 +88,7 @@ public class MultiRedditManager extends AbstractManager {
         MultiRedditUpdateRequest.SubredditModel data = new MultiRedditUpdateRequest.SubredditModel(subreddit);
 
         HttpRequest request = reddit.request()
-                .endpoint(Endpoints.MULTI_MULTIPATH_R_SRNAME_PUT, multiName, subreddit)
+                .endpoint(Endpoints.MULTI_MULTIPATH_R_SRNAME_PUT, getMultiPath(multiName).substring(1), subreddit)
                 .put(JrawUtils.mapOf(
                         "model", JrawUtils.toJson(data),
                         "multipath", getMultiPath(multiName),
