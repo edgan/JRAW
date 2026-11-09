@@ -343,6 +343,23 @@ public final class CommentNode implements Iterable<CommentNode> {
     }
 
     /**
+     * Notifies the tree that a comment was edited, from a copy of it already in hand, such as the one
+     * {@link net.dean.jraw.managers.AccountManager#updateContribution(PublicContribution, String)} returns. Unlike
+     * {@link #notifyCommentChanged(RedditClient)}, this makes no request.
+     *
+     * @param updated The edited comment
+     * @return This node
+     * @throws IllegalArgumentException If {@code updated} is not the comment this node represents
+     */
+    public CommentNode notifyCommentChanged(Comment updated) {
+        String fullName = updated.getFullName();
+        if (fullName == null || !fullName.equals(comment.getFullName()))
+            throw new IllegalArgumentException("Expecting " + comment.getFullName() + ", got " + fullName);
+        comment = updated;
+        return this;
+    }
+
+    /**
      * Gets more comments from {@link #getMoreComments(RedditClient)} and inserts them into the tree. This method
      * returns only new <em>root</em> nodes. If this CommentNode is not associated with a {@link MoreChildren}, then an
      * empty list is returned. A null value is never returned.

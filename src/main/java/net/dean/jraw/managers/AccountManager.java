@@ -25,6 +25,7 @@ import net.dean.jraw.models.Thing;
 import net.dean.jraw.models.UserRecord;
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.models.attr.Votable;
+import net.dean.jraw.models.meta.Model;
 import net.dean.jraw.util.JrawUtils;
 
 import java.net.URL;
@@ -32,6 +33,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class manages common user actions, such as voting, commenting, saving, etc.
@@ -310,18 +312,34 @@ public class AccountManager extends AbstractManager {
      *
      * @param contribution The self-post or comment that to edit the text for
      * @param text         The new body
+     * @return The edited Comment as reddit returned it, or null for a Submission or when the response did not include
+     *         it. The edit has been made either way, so nothing after the request may throw.
      * @throws NetworkException If the request was not successful
      * @throws ApiException     If the API returned an error
      */
     @EndpointImplementation(Endpoints.EDITUSERTEXT)
-    public <T extends PublicContribution> void updateContribution(T contribution, String text) throws NetworkException, ApiException {
-        genericPost(reddit.request().endpoint(Endpoints.EDITUSERTEXT)
+    public <T extends PublicContribution> @Nullable Thing updateContribution(T contribution, String text) throws NetworkException, ApiException {
+        RestResponse response = genericPost(reddit.request().endpoint(Endpoints.EDITUSERTEXT)
                 .post(JrawUtils.mapOf(
                         "api_type", "json",
                         "text", text,
                         "validate_on_submit", true,
                         "thing_id", contribution.getFullName()
                 )).build());
+
+        JsonNode root = response.getJson();
+        if (root == null)
+            return null;
+        // {"json": {"errors": [], "data": {"things": [{"kind": "t1", "data": {...}}]}}}
+        JsonNode thing = root.path("json").path("data").path("things").path(0);
+        JsonNode data = thing.path("data");
+        if (!data.isObject())
+            return null;
+        String kind = thing.path("kind").asText();
+        if (kind.equals(Model.Kind.COMMENT.getValue()))
+            return new Comment(data);
+        // Not a Submission: its constructor unboxes "saved" and throws when the answer leaves it out.
+        return null;
     }
 
     /**
